@@ -5,11 +5,11 @@ pragma solidity 0.8.26;
 /// @notice Library for all contract errors.
 library Errors {
     /// @notice The caller is not approved.
-    error NotApprovedCaller();
+    error Attestator__NotApprovedCaller();
     /// @notice The schema registry is zero address.
-    error ZeroSchemaRegistry();
+    error Attestator__ZeroSchemaRegistry();
     /// @notice The EAS is zero address.
-    error ZeroEAS();
+    error Attestator__ZeroEAS();
     /// @notice The caller is zero address.
-    error ZeroCaller();
+    error Attestator__ZeroCaller();
 }

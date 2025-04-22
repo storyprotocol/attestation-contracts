@@ -18,7 +18,7 @@ contract Attestator is IAttestator, Ownable {
     mapping(address => bool) public approvedCallers;
 
     modifier onlyApprovedCaller() {
-        if (!approvedCallers[msg.sender]) revert Errors.NotApprovedCaller();
+        if (!approvedCallers[msg.sender]) revert Errors.Attestator__NotApprovedCaller();
         _;
     }
 
@@ -27,8 +27,8 @@ contract Attestator is IAttestator, Ownable {
     /// @param _schemaRegistry The address of the schema registry
     /// @param _eas The address of the EAS contract
     constructor(address _owner, address _schemaRegistry, address _eas) Ownable(_owner) {
-        if (_schemaRegistry == address(0)) revert Errors.ZeroSchemaRegistry();
-        if (_eas == address(0)) revert Errors.ZeroEAS();
+        if (_schemaRegistry == address(0)) revert Errors.Attestator__ZeroSchemaRegistry();
+        if (_eas == address(0)) revert Errors.Attestator__ZeroEAS();
 
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
         eas = IEAS(_eas);
@@ -37,7 +37,7 @@ contract Attestator is IAttestator, Ownable {
     /// @notice Sets the schema registry
     /// @param _schemaRegistry The address of the schema registry
     function setSchemaRegistry(address _schemaRegistry) external onlyOwner {
-        if (_schemaRegistry == address(0)) revert Errors.ZeroSchemaRegistry();
+        if (_schemaRegistry == address(0)) revert Errors.Attestator__ZeroSchemaRegistry();
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
         emit SchemaRegistrySet(_schemaRegistry);
     }
@@ -45,7 +45,7 @@ contract Attestator is IAttestator, Ownable {
     /// @notice Sets the EAS contract
     /// @param _eas The address of the EAS contract
     function setEAS(address _eas) external onlyOwner {
-        if (_eas == address(0)) revert Errors.ZeroEAS();
+        if (_eas == address(0)) revert Errors.Attestator__ZeroEAS();
         eas = IEAS(_eas);
         emit EASSet(_eas);
     }
@@ -54,7 +54,7 @@ contract Attestator is IAttestator, Ownable {
     /// @param _caller The address of the caller to set
     /// @param _approved Whether the caller is approved
     function setApprovedCaller(address _caller, bool _approved) external onlyOwner {
-        if (_caller == address(0)) revert Errors.ZeroCaller();
+        if (_caller == address(0)) revert Errors.Attestator__ZeroCaller();
         approvedCallers[_caller] = _approved;
         emit ApprovedCallerSet(_caller, _approved);
     }
