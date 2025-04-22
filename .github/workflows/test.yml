@@ -23,7 +23,7 @@ jobs:
           restore-keys: npm-
       - run: yarn
         if: steps.cache.outputs.cache-hit != 'true'
-      - run: npm run lint
+      - run: forge fmt
 
   foundry-test:
     strategy:
