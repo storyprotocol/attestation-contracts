@@ -1,20 +1,25 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
-import { Test } from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import { Ownable } from "openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-import { Attestator } from "../../contracts/Attestator.sol";
-import { Errors } from "../../contracts/lib/Errors.sol";
+import {ISchemaResolver} from "../../contracts/interfaces/EAS/ISchemaResolver.sol";
+import {MultiAttestationRequest, AttestationRequestData} from "../../contracts/interfaces/EAS/IEAS.sol";
+
+import {Attestator} from "../../contracts/Attestator.sol";
+import {Errors} from "../../contracts/lib/Errors.sol";
 
 contract AttestatorTest is Test {
     Attestator public attestator;
     address public owner;
+    address public approvedCaller;
+
     function setUp() public {
         // Fork the desired network where EAS contracts are deployed
         uint256 forkId = vm.createFork("https://mainnet.storyrpc.io/");
-        vm.selectFork(forkId); 
+        vm.selectFork(forkId);
 
         // Mainnet
         // EAS related addresses
@@ -23,7 +28,13 @@ contract AttestatorTest is Test {
 
         // Deploy the Attestator contract
         owner = makeAddr("owner");
-        attestator = new Attestator(owner, eas, schemaRegistry);
+        attestator = new Attestator(owner, schemaRegistry, eas);
+
+        // Set the approved caller
+        vm.startPrank(owner);
+        approvedCaller = makeAddr("approvedCaller");
+        attestator.setApprovedCaller(approvedCaller, true);
+        vm.stopPrank();
     }
 
     function test_constructor_revert_ZeroSchemaRegistry() public {
@@ -56,15 +67,14 @@ contract AttestatorTest is Test {
         attestator.setSchemaRegistry(address(0));
         vm.stopPrank();
     }
-    
 
     function test_setSchemaRegistry() public {
         vm.startPrank(owner);
         attestator.setSchemaRegistry(address(1));
         assertEq(address(attestator.schemaRegistry()), address(1));
         vm.stopPrank();
-    }  
-    
+    }
+
     function test_setEAS_revert_NotOwner() public {
         vm.startPrank(address(2));
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(2)));
@@ -85,7 +95,7 @@ contract AttestatorTest is Test {
         assertEq(address(attestator.eas()), address(1));
         vm.stopPrank();
     }
-    
+
     function test_setApprovedCaller_revert_NotOwner() public {
         vm.startPrank(address(2));
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(2)));
@@ -105,5 +115,29 @@ contract AttestatorTest is Test {
         attestator.setApprovedCaller(address(1), true);
         assertEq(attestator.approvedCallers(address(1)), true);
         vm.stopPrank();
-    }    
+    }
+
+    function test_multiAttest() public {
+        AttestationRequestData[] memory requestData = new AttestationRequestData[](1);
+        requestData[0] = AttestationRequestData(
+            address(0xb5f173bF43F4Fd0D7fE80243d74Ce011F35ECFCB), 0, true, bytes32(0), bytes("test"), 0
+        );
+
+        MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](1);
+        multiRequests[0] = MultiAttestationRequest(
+            bytes32(0x9f898eca4ae41fb754e11c0062de5a4c6f35b52baa22df17bffa20a0d9fad28e), requestData
+        );
+
+        vm.startPrank(approvedCaller);
+        attestator.multiAttest(multiRequests);
+        vm.stopPrank();
+    }
+
+    function test_registerSchema() public {
+        vm.startPrank(approvedCaller);
+        string memory schema = "test";
+        ISchemaResolver resolver = ISchemaResolver(address(0));
+        attestator.registerSchema(schema, resolver, true);
+        vm.stopPrank();
+    }
 }
