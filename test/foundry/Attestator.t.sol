@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-import {ISchemaResolver} from "../../contracts/interfaces/EAS/ISchemaResolver.sol";
-import {MultiAttestationRequest, AttestationRequestData} from "../../contracts/interfaces/EAS/IEAS.sol";
+import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
+import {MultiAttestationRequest, AttestationRequestData} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
 import {Attestator} from "../../contracts/Attestator.sol";
 import {Errors} from "../../contracts/lib/Errors.sol";
