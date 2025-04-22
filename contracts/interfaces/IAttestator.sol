@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
-import {IEAS, MultiAttestationRequest} from "./EAS/IEAS.sol";
-import {ISchemaResolver} from "./EAS/ISchemaResolver.sol";
+import {IEAS, MultiAttestationRequest} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
+import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
 
 /// @title IAttestator
 /// @notice The interface of the Attestator contract

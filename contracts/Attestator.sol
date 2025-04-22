@@ -3,9 +3,9 @@ pragma solidity 0.8.26;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import {ISchemaRegistry} from "./interfaces/EAS/ISchemaRegistry.sol";
-import {ISchemaResolver} from "./interfaces/EAS/ISchemaResolver.sol";
-import {IEAS, MultiAttestationRequest} from "./interfaces/EAS/IEAS.sol";
+import {ISchemaRegistry} from "@ethereum-attestation-service/eas-contracts/contracts/ISchemaRegistry.sol";
+import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
+import {IEAS, MultiAttestationRequest} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 import {IAttestator} from "./interfaces/IAttestator.sol";
 import {Errors} from "./lib/Errors.sol";
 
