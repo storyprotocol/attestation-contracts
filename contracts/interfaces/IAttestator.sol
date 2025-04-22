@@ -7,6 +7,19 @@ import { ISchemaResolver } from "./EAS/ISchemaResolver.sol";
 /// @title IAttestator
 /// @notice The interface of the Attestator contract
 interface IAttestator {
+    /// @notice Emitted when the schema registry is set
+    /// @param schemaRegistry The address of the schema registry
+    event SchemaRegistrySet(address indexed schemaRegistry);
+
+    /// @notice Emitted when the EAS contract is set
+    /// @param eas The address of the EAS contract
+    event EASSet(address indexed eas);
+
+    /// @notice Emitted when an approved caller is set
+    /// @param caller The address of the caller
+    /// @param approved Whether the caller is approved
+    event ApprovedCallerSet(address indexed caller, bool approved);
+
     /// @notice Sets the schema registry
     /// @param _schemaRegistry The address of the schema registry
     function setSchemaRegistry(address _schemaRegistry) external;

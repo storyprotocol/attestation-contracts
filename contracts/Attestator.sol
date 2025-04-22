@@ -6,11 +6,12 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ISchemaRegistry } from "./interfaces/EAS/ISchemaRegistry.sol";
 import { ISchemaResolver } from "./interfaces/EAS/ISchemaResolver.sol";
 import { IEAS, MultiAttestationRequest } from "./interfaces/EAS/IEAS.sol";
+import { IAttestator } from "./interfaces/IAttestator.sol";
 import { Errors } from "./lib/Errors.sol";
 
 /// @title Attestator
 /// @notice The Attestator is a contract that allows to do multiple attestations using a single call and register schemas
-contract Attestator is Ownable {
+contract Attestator is IAttestator, Ownable {
     ISchemaRegistry public schemaRegistry;
     IEAS public eas;
 
@@ -38,6 +39,7 @@ contract Attestator is Ownable {
     function setSchemaRegistry(address _schemaRegistry) external onlyOwner {
         if (_schemaRegistry == address(0)) revert Errors.ZeroSchemaRegistry();
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
+        emit SchemaRegistrySet(_schemaRegistry);
     }
 
     /// @notice Sets the EAS contract
@@ -45,6 +47,7 @@ contract Attestator is Ownable {
     function setEAS(address _eas) external onlyOwner {
         if (_eas == address(0)) revert Errors.ZeroEAS();
         eas = IEAS(_eas);
+        emit EASSet(_eas);
     }
 
     /// @notice Sets an approved caller
@@ -53,6 +56,7 @@ contract Attestator is Ownable {
     function setApprovedCaller(address _caller, bool _approved) external onlyOwner {
         if (_caller == address(0)) revert Errors.ZeroCaller();
         approvedCallers[_caller] = _approved;
+        emit ApprovedCallerSet(_caller, _approved);
     }
 
     /// @notice Attests to multiple schemas.
