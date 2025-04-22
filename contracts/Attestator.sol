@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import { ISchemaRegistry } from "./interfaces/EAS/ISchemaRegistry.sol";
-import { ISchemaResolver } from "./interfaces/EAS/ISchemaResolver.sol";
-import { IEAS, MultiAttestationRequest } from "./interfaces/EAS/IEAS.sol";
-import { IAttestator } from "./interfaces/IAttestator.sol";
-import { Errors } from "./lib/Errors.sol";
+import {ISchemaRegistry} from "./interfaces/EAS/ISchemaRegistry.sol";
+import {ISchemaResolver} from "./interfaces/EAS/ISchemaResolver.sol";
+import {IEAS, MultiAttestationRequest} from "./interfaces/EAS/IEAS.sol";
+import {IAttestator} from "./interfaces/IAttestator.sol";
+import {Errors} from "./lib/Errors.sol";
 
 /// @title Attestator
 /// @notice The Attestator is a contract that allows to do multiple attestations using a single call and register schemas
@@ -39,6 +39,7 @@ contract Attestator is IAttestator, Ownable {
     function setSchemaRegistry(address _schemaRegistry) external onlyOwner {
         if (_schemaRegistry == address(0)) revert Errors.Attestator__ZeroSchemaRegistry();
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
+
         emit SchemaRegistrySet(_schemaRegistry);
     }
 
@@ -47,6 +48,7 @@ contract Attestator is IAttestator, Ownable {
     function setEAS(address _eas) external onlyOwner {
         if (_eas == address(0)) revert Errors.Attestator__ZeroEAS();
         eas = IEAS(_eas);
+
         emit EASSet(_eas);
     }
 
@@ -56,6 +58,7 @@ contract Attestator is IAttestator, Ownable {
     function setApprovedCaller(address _caller, bool _approved) external onlyOwner {
         if (_caller == address(0)) revert Errors.Attestator__ZeroCaller();
         approvedCallers[_caller] = _approved;
+
         emit ApprovedCallerSet(_caller, _approved);
     }
 
@@ -63,7 +66,12 @@ contract Attestator is IAttestator, Ownable {
     /// @param multiRequests The arguments of the multi attestation requests. The requests should be grouped by distinct
     ///        schema ids to benefit from the best batching optimization.
     /// @return The UIDs of the new attestations.
-    function multiAttest(MultiAttestationRequest[] calldata multiRequests) external onlyApprovedCaller payable returns (bytes32[] memory) {
+    function multiAttest(MultiAttestationRequest[] calldata multiRequests)
+        external
+        payable
+        onlyApprovedCaller
+        returns (bytes32[] memory)
+    {
         return eas.multiAttest{value: msg.value}(multiRequests);
     }
 
@@ -72,7 +80,11 @@ contract Attestator is IAttestator, Ownable {
     /// @param resolver An optional schema resolver
     /// @param revocable Whether the schema allows revocations explicitly
     /// @return schemaId The UID of the new schema
-    function registerSchema(string calldata schema, ISchemaResolver resolver, bool revocable) external onlyApprovedCaller returns (bytes32 schemaId) {
+    function registerSchema(string calldata schema, ISchemaResolver resolver, bool revocable)
+        external
+        onlyApprovedCaller
+        returns (bytes32 schemaId)
+    {
         schemaId = schemaRegistry.register(schema, resolver, revocable);
-    } 
+    }
 }

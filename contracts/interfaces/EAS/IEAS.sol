@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import { ISchemaRegistry } from "./ISchemaRegistry.sol";
-import { ISemver } from "./ISemver.sol";
-import { Attestation, Signature } from "./Common.sol";
+import {ISchemaRegistry} from "./ISchemaRegistry.sol";
+import {ISemver} from "./ISemver.sol";
+import {Attestation, Signature} from "./Common.sol";
 
 /// @notice A struct representing the arguments of the attestation request.
 struct AttestationRequestData {
@@ -154,9 +154,10 @@ interface IEAS is ISemver {
     ///         attester: '0xc5E8740aD971409492b1A63Db8d83025e0Fc427e',
     ///         deadline: 1673891048
     ///     })
-    function attestByDelegation(
-        DelegatedAttestationRequest calldata delegatedRequest
-    ) external payable returns (bytes32);
+    function attestByDelegation(DelegatedAttestationRequest calldata delegatedRequest)
+        external
+        payable
+        returns (bytes32);
 
     /// @notice Attests to multiple schemas.
     /// @param multiRequests The arguments of the multi attestation requests. The requests should be grouped by distinct
@@ -194,7 +195,10 @@ interface IEAS is ISemver {
     ///             value: 0
     ///         },
     ///     }])
-    function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory);
+    function multiAttest(MultiAttestationRequest[] calldata multiRequests)
+        external
+        payable
+        returns (bytes32[] memory);
 
     /// @notice Attests to multiple schemas using via provided ECDSA signatures.
     /// @param multiDelegatedRequests The arguments of the delegated multi attestation requests. The requests should be
@@ -233,9 +237,10 @@ interface IEAS is ISemver {
     ///         attester: '0x1D86495b2A7B524D747d2839b3C645Bed32e8CF4',
     ///         deadline: 1673891048
     ///     }])
-    function multiAttestByDelegation(
-        MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests
-    ) external payable returns (bytes32[] memory);
+    function multiAttestByDelegation(MultiDelegatedAttestationRequest[] calldata multiDelegatedRequests)
+        external
+        payable
+        returns (bytes32[] memory);
 
     /// @notice Revokes an existing attestation to a specific schema.
     /// @param request The arguments of the revocation request.
@@ -323,9 +328,9 @@ interface IEAS is ISemver {
     ///         revoker: '0x244934dd3e31bE2c81f84ECf0b3E6329F5381992',
     ///         deadline: 1673891048
     ///     }])
-    function multiRevokeByDelegation(
-        MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests
-    ) external payable;
+    function multiRevokeByDelegation(MultiDelegatedRevocationRequest[] calldata multiDelegatedRequests)
+        external
+        payable;
 
     /// @notice Timestamps the specified bytes32 data.
     /// @param data The data to timestamp.

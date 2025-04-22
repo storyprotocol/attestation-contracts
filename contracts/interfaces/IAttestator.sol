@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
-import { IEAS, MultiAttestationRequest } from "./EAS/IEAS.sol";
-import { ISchemaResolver } from "./EAS/ISchemaResolver.sol";
+import {IEAS, MultiAttestationRequest} from "./EAS/IEAS.sol";
+import {ISchemaResolver} from "./EAS/ISchemaResolver.sol";
 
 /// @title IAttestator
 /// @notice The interface of the Attestator contract
@@ -37,12 +37,17 @@ interface IAttestator {
     /// @param multiRequests The arguments of the multi attestation requests. The requests should be grouped by distinct
     ///        schema ids to benefit from the best batching optimization.
     /// @return The UIDs of the new attestations.
-    function multiAttest(MultiAttestationRequest[] calldata multiRequests) external payable returns (bytes32[] memory);
+    function multiAttest(MultiAttestationRequest[] calldata multiRequests)
+        external
+        payable
+        returns (bytes32[] memory);
 
     /// @notice Submits and reserves a new schema
     /// @param schema The schema data schema
     /// @param resolver An optional schema resolver
     /// @param revocable Whether the schema allows revocations explicitly
     /// @return schemaId The UID of the new schema
-    function registerSchema(string calldata schema, ISchemaResolver resolver, bool revocable) external returns (bytes32 schemaId);
+    function registerSchema(string calldata schema, ISchemaResolver resolver, bool revocable)
+        external
+        returns (bytes32 schemaId);
 }

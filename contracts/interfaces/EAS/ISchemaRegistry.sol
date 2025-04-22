@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import { ISemver } from "./ISemver.sol";
-import { ISchemaResolver } from "./ISchemaResolver.sol";
+import {ISemver} from "./ISemver.sol";
+import {ISchemaResolver} from "./ISchemaResolver.sol";
 
 /// @notice A struct representing a record for a submitted schema.
 struct SchemaRecord {

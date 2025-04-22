@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import { Attestation } from "./Common.sol";
-import { ISemver } from "./ISemver.sol";
+import {Attestation} from "./Common.sol";
+import {ISemver} from "./ISemver.sol";
 
 /// @title ISchemaResolver
 /// @notice The interface of an optional schema resolver.
@@ -20,10 +20,10 @@ interface ISchemaResolver is ISemver {
     /// @param attestations The new attestations.
     /// @param values Explicit ETH amounts which were sent with each attestation.
     /// @return Whether all the attestations are valid.
-    function multiAttest(
-        Attestation[] calldata attestations,
-        uint256[] calldata values
-    ) external payable returns (bool);
+    function multiAttest(Attestation[] calldata attestations, uint256[] calldata values)
+        external
+        payable
+        returns (bool);
 
     /// @notice Processes an attestation revocation and verifies if it can be revoked.
     /// @param attestation The existing attestation to be revoked.
@@ -34,8 +34,8 @@ interface ISchemaResolver is ISemver {
     /// @param attestations The existing attestations to be revoked.
     /// @param values Explicit ETH amounts which were sent with each revocation.
     /// @return Whether the attestations can be revoked.
-    function multiRevoke(
-        Attestation[] calldata attestations,
-        uint256[] calldata values
-    ) external payable returns (bool);
+    function multiRevoke(Attestation[] calldata attestations, uint256[] calldata values)
+        external
+        payable
+        returns (bool);
 }
