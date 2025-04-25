@@ -6,7 +6,12 @@ import {Test} from "forge-std/Test.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
 import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
-import {MultiAttestationRequest, AttestationRequestData} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
+import {
+    MultiAttestationRequest,
+    AttestationRequestData,
+    MultiRevocationRequest,
+    RevocationRequestData
+} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
 import {Attestator} from "../../contracts/Attestator.sol";
 import {Errors} from "../../contracts/lib/Errors.sol";
@@ -117,6 +122,13 @@ contract AttestatorTest is Test {
         vm.stopPrank();
     }
 
+    function test_multiAttest_revert_NotApprovedCaller() public {
+        vm.startPrank(address(1));
+        vm.expectRevert(Errors.Attestator__NotApprovedCaller.selector);
+        attestator.multiAttest(new MultiAttestationRequest[](0));
+        vm.stopPrank();
+    }
+
     function test_multiAttest() public {
         AttestationRequestData[] memory requestData = new AttestationRequestData[](1);
         requestData[0] = AttestationRequestData(
@@ -130,6 +142,48 @@ contract AttestatorTest is Test {
 
         vm.startPrank(approvedCaller);
         attestator.multiAttest(multiRequests);
+        vm.stopPrank();
+    }
+
+    function test_multiRevoke_revert_NotApprovedCaller() public {
+        vm.startPrank(address(1));
+        vm.expectRevert(Errors.Attestator__NotApprovedCaller.selector);
+        attestator.multiRevoke(new MultiRevocationRequest[](0));
+        vm.stopPrank();
+    }
+
+    function test_multiRevoke() public {
+        AttestationRequestData[] memory requestData = new AttestationRequestData[](1);
+        requestData[0] = AttestationRequestData(
+            address(0xb5f173bF43F4Fd0D7fE80243d74Ce011F35ECFCB), 0, true, bytes32(0), bytes("test"), 0
+        );
+
+        MultiAttestationRequest[] memory multiRequests = new MultiAttestationRequest[](1);
+        multiRequests[0] = MultiAttestationRequest(
+            bytes32(0x9f898eca4ae41fb754e11c0062de5a4c6f35b52baa22df17bffa20a0d9fad28e), requestData
+        );
+
+        vm.startPrank(approvedCaller);
+        bytes32[] memory uids = attestator.multiAttest(multiRequests);
+        vm.stopPrank();
+
+        RevocationRequestData[] memory revocationRequestData = new RevocationRequestData[](1);
+        revocationRequestData[0] = RevocationRequestData(uids[0], 0);
+
+        MultiRevocationRequest[] memory multiRevokes = new MultiRevocationRequest[](1);
+        multiRevokes[0] = MultiRevocationRequest(
+            bytes32(0x9f898eca4ae41fb754e11c0062de5a4c6f35b52baa22df17bffa20a0d9fad28e), revocationRequestData
+        );
+
+        vm.startPrank(approvedCaller);
+        attestator.multiRevoke(multiRevokes);
+        vm.stopPrank();
+    }
+
+    function test_registerSchema_revert_NotApprovedCaller() public {
+        vm.startPrank(address(1));
+        vm.expectRevert(Errors.Attestator__NotApprovedCaller.selector);
+        attestator.registerSchema("test", ISchemaResolver(address(0)), true);
         vm.stopPrank();
     }
 

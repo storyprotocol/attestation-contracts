@@ -5,7 +5,11 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 import {ISchemaRegistry} from "@ethereum-attestation-service/eas-contracts/contracts/ISchemaRegistry.sol";
 import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
-import {IEAS, MultiAttestationRequest} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
+import {
+    IEAS,
+    MultiAttestationRequest,
+    MultiRevocationRequest
+} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 import {IAttestator} from "./interfaces/IAttestator.sol";
 import {Errors} from "./lib/Errors.sol";
 
@@ -73,6 +77,13 @@ contract Attestator is IAttestator, Ownable {
         returns (bytes32[] memory)
     {
         return eas.multiAttest{value: msg.value}(multiRequests);
+    }
+
+    /// @notice Revokes existing attestations to multiple schemas.
+    /// @param multiRequests The arguments of the multi revocation requests. The requests should be grouped by distinct
+    ///     schema ids to benefit from the best batching optimization.
+    function multiRevoke(MultiRevocationRequest[] calldata multiRequests) external payable onlyApprovedCaller {
+        eas.multiRevoke{value: msg.value}(multiRequests);
     }
 
     /// @notice Submits and reserves a new schema
