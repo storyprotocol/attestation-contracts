@@ -4,6 +4,8 @@ pragma solidity 0.8.26;
 import {Test} from "forge-std/Test.sol";
 
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
+import {ERC1967Proxy} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {UUPSUpgradeable} from "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
 import {
@@ -20,6 +22,8 @@ contract AttestatorTest is Test {
     Attestator public attestator;
     address public owner;
     address public approvedCaller;
+    address public eas;
+    address public schemaRegistry;
 
     function setUp() public {
         // Fork the desired network where EAS contracts are deployed
@@ -28,12 +32,17 @@ contract AttestatorTest is Test {
 
         // Mainnet
         // EAS related addresses
-        address eas = 0x5bF79CECE7D1C9DA45a9F0dE480589ecCE1B48c8;
-        address schemaRegistry = 0x5F983ab12EE78535C9067dE1CDFc7C511320fB7d;
+        eas = 0x5bF79CECE7D1C9DA45a9F0dE480589ecCE1B48c8;
+        schemaRegistry = 0x5F983ab12EE78535C9067dE1CDFc7C511320fB7d;
 
         // Deploy the Attestator contract
         owner = makeAddr("owner");
-        attestator = new Attestator(owner, schemaRegistry, eas);
+        address attestatorImpl = address(new Attestator());
+        attestator = Attestator(
+            address(
+                new ERC1967Proxy(attestatorImpl, abi.encodeCall(Attestator.initialize, (owner, schemaRegistry, eas)))
+            )
+        );
 
         // Set the approved caller
         vm.startPrank(owner);
@@ -42,21 +51,22 @@ contract AttestatorTest is Test {
         vm.stopPrank();
     }
 
-    function test_constructor_revert_ZeroSchemaRegistry() public {
+    function test_initialize() public view {
+        assertEq(attestator.owner(), owner);
+        assertEq(address(attestator.schemaRegistry()), schemaRegistry);
+        assertEq(address(attestator.eas()), eas);
+    }
+
+    function test_initialize_revert_ZeroSchemaRegistry() public {
+        address attestatorImpl = address(new Attestator());
         vm.expectRevert(Errors.Attestator__ZeroSchemaRegistry.selector);
-        new Attestator(address(1), address(0), address(2));
+        new ERC1967Proxy(attestatorImpl, abi.encodeCall(Attestator.initialize, (owner, address(0), address(1))));
     }
 
-    function test_constructor_revert_ZeroEAS() public {
+    function test_initialize_revert_ZeroEAS() public {
+        address attestatorImpl = address(new Attestator());
         vm.expectRevert(Errors.Attestator__ZeroEAS.selector);
-        new Attestator(address(1), address(2), address(0));
-    }
-
-    function test_constructor() public {
-        Attestator newAttestator = new Attestator(address(1), address(2), address(3));
-        assertEq(newAttestator.owner(), address(1));
-        assertEq(address(newAttestator.schemaRegistry()), address(2));
-        assertEq(address(newAttestator.eas()), address(3));
+        new ERC1967Proxy(attestatorImpl, abi.encodeCall(Attestator.initialize, (owner, address(1), address(0))));
     }
 
     function test_setSchemaRegistry_revert_NotOwner() public {
@@ -193,5 +203,21 @@ contract AttestatorTest is Test {
         ISchemaResolver resolver = ISchemaResolver(address(0));
         attestator.registerSchema(schema, resolver, true);
         vm.stopPrank();
+    }
+
+    function test_upgrade() public {
+        address easAddressBefore = address(attestator.eas());
+        address schemaRegistryAddressBefore = address(attestator.schemaRegistry());
+
+        vm.startPrank(owner);
+        address newAttestatorImpl = address(new Attestator());
+        UUPSUpgradeable(address(attestator)).upgradeToAndCall(newAttestatorImpl, "");
+        vm.stopPrank();
+
+        address easAddressAfter = address(attestator.eas());
+        address schemaRegistryAddressAfter = address(attestator.schemaRegistry());
+
+        assertEq(easAddressAfter, easAddressBefore);
+        assertEq(schemaRegistryAddressAfter, schemaRegistryAddressBefore);
     }
 }
