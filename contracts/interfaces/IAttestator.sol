@@ -3,6 +3,7 @@ pragma solidity 0.8.26;
 
 import {IEAS, MultiAttestationRequest} from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 import {ISchemaResolver} from "@ethereum-attestation-service/eas-contracts/contracts/resolver/ISchemaResolver.sol";
+import {ISchemaRegistry} from "@ethereum-attestation-service/eas-contracts/contracts/ISchemaRegistry.sol";
 
 /// @title IAttestator
 /// @notice The interface of the Attestator contract
@@ -50,4 +51,17 @@ interface IAttestator {
     function registerSchema(string calldata schema, ISchemaResolver resolver, bool revocable)
         external
         returns (bytes32 schemaId);
+
+    /// @notice Returns the schema registry
+    /// @return schemaRegistry The address of the schema registry
+    function schemaRegistry() external view returns (ISchemaRegistry);
+
+    /// @notice Returns the EAS contract
+    /// @return eas The address of the EAS contract
+    function eas() external view returns (IEAS);
+
+    /// @notice Returns whether an address is an approved caller
+    /// @param caller The address to check
+    /// @return isApproved Whether the address is an approved caller
+    function approvedCallers(address caller) external view returns (bool);
 }
